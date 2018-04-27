@@ -1,6 +1,6 @@
 /************************************************************************************************************************************\
 |*                                                                                                                                    *|
-|*     Copyright © 2017 NVIDIA Corporation.  All rights reserved.                                                                     *|
+|*     Copyright ?2017 NVIDIA Corporation.  All rights reserved.                                                                     *|
 |*                                                                                                                                    *|
 |*  NOTICE TO USER:                                                                                                                   *|
 |*                                                                                                                                    *|
@@ -85,7 +85,7 @@ ID3D12DevicePtr createDevice(IDXGIFactory4Ptr pDxgiFactory)
 #endif
         // Create the device
         ID3D12DevicePtr pDevice;
-        HRESULT hr = D3D12EnableExperimentalFeatures(1, &D3D12RaytracingPrototype, NULL, NULL);
+        HRESULT hr = D3D12EnableExpreimentalFeatures(1, &D3D12RaytracingPrototype, NULL, NULL);
         if (FAILED(hr))
         {
             d3dTraceHR("Could not enable raytracing (D3D12EnableExperimentalFeatures() failed).\n" \
