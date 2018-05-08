@@ -11,23 +11,23 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="07-2 NonTriangle.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="07-2 NonTriangle.h" />
-  </ItemGroup>
-  <ItemGroup>
     <FxCompile Include="Data\07-Shaders.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="15-NonTriangle.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="15-NonTriangle.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{83D39263-59EF-4CC8-82F2-5415CF442CB2}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>DXRT</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
-    <ProjectName>07-2 NonTriangle</ProjectName>
+    <ProjectName>15-NonTriangle</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">

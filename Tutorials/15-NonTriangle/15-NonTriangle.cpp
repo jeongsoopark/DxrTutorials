@@ -31,7 +31,7 @@
 |*  the above Disclaimer (as applicable) and U.S. Government End Users Notice.                                                        *|
 |*                                                                                                                                    *|
  \************************************************************************************************************************************/
-#include "07-BasicShaders.h"
+#include "15-NonTriangle.h"
 #include "Externals/DXCAPI/dxcapi.use.h"
 #include "Externals/DXR/include/dxcapi.h"
 #include <sstream>
@@ -276,6 +276,24 @@ ID3D12ResourcePtr createBuffer(ID3D12DevicePtr pDevice, uint64_t size, D3D12_RES
 
     ID3D12ResourcePtr pBuffer;
     d3d_call(pDevice->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE, &bufDesc, initState, nullptr, IID_PPV_ARGS(&pBuffer)));
+    return pBuffer;
+}
+
+ID3D12ResourcePtr createSphereVB(ID3D12DevicePtr pDevice)
+{
+	//AABB for a sphere positioned at (0, 0, 0) of radius (1.0)
+    const vec3 vertices[] =
+    {
+        vec3(-1, -1, -1),
+        vec3(1, 1, 1),
+    };
+
+    // For simplicity, we create the vertex buffer on the upload heap, but that's not required
+    ID3D12ResourcePtr pBuffer = createBuffer(pDevice, sizeof(vertices), D3D12_RESOURCE_FLAG_NONE, D3D12_RESOURCE_STATE_GENERIC_READ, kUploadHeapProps);
+    uint8_t* pData;
+    pBuffer->Map(0, nullptr, (void**)&pData);
+    memcpy(pData, vertices, sizeof(vertices));
+    pBuffer->Unmap(0, nullptr);
     return pBuffer;
 }
 

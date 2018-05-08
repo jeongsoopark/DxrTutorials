@@ -70,7 +70,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "05-ShaderTable", "Tutorials
 		{70624B07-6050-4BB7-BBBB-0AF66D3B99C8} = {70624B07-6050-4BB7-BBBB-0AF66D3B99C8}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "07-2 NonTriangle", "Tutorials\07-2 NonTriangle\07-2 NonTriangle.vcxproj", "{83D39263-59EF-4CC8-82F2-5415CF442CB2}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "15-NonTriangle", "Tutorials\15-NonTriangle\15-NonTriangle.vcxproj", "{83D39263-59EF-4CC8-82F2-5415CF442CB2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
