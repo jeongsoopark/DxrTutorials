@@ -279,13 +279,13 @@ ID3D12ResourcePtr createBuffer(ID3D12DevicePtr pDevice, uint64_t size, D3D12_RES
     return pBuffer;
 }
 
-ID3D12ResourcePtr createSphereVB(ID3D12DevicePtr pDevice)
+ID3D12ResourcePtr createAABB(ID3D12DevicePtr pDevice)
 {
 	//AABB for a sphere positioned at (0, 0, 0) of radius (1.0)
     const vec3 vertices[] =
     {
-        vec3(-1, -1, -1),
         vec3(1, 1, 1),
+        vec3(3, 3, 3),
     };
 
     // For simplicity, we create the vertex buffer on the upload heap, but that's not required
@@ -325,11 +325,10 @@ struct AccelerationStructureBuffers
 AccelerationStructureBuffers createBottomLevelAS(ID3D12DevicePtr pDevice, ID3D12GraphicsCommandListPtr pCmdList, ID3D12ResourcePtr pVB)
 {
     D3D12_RAYTRACING_GEOMETRY_DESC geomDesc = {};
-    geomDesc.Type = D3D12_RAYTRACING_GEOMETRY_TYPE_TRIANGLES;
-    geomDesc.Triangles.VertexBuffer.StartAddress = pVB->GetGPUVirtualAddress();
-    geomDesc.Triangles.VertexBuffer.StrideInBytes = sizeof(vec3);
-    geomDesc.Triangles.VertexFormat = DXGI_FORMAT_R32G32B32_FLOAT;
-    geomDesc.Triangles.VertexCount = 3;
+    geomDesc.Type = D3D12_RAYTRACING_GEOMETRY_TYPE_PROCEDURAL_PRIMITIVE_AABBS;
+	geomDesc.AABBs.AABBCount = 1;
+	geomDesc.AABBs.AABBs.StrideInBytes = 2*sizeof(vec3);
+    geomDesc.AABBs.AABBs.StartAddress = pVB->GetGPUVirtualAddress();
     geomDesc.Flags = D3D12_RAYTRACING_GEOMETRY_FLAG_OPAQUE;
 
     // Get the size requirements for the scratch and AS buffers
@@ -438,7 +437,7 @@ AccelerationStructureBuffers createTopLevelAS(ID3D12DevicePtr pDevice, ID3D12Gra
 
 void DxrSample::createAccelerationStructures()
 {
-    mpVertexBuffer = createTriangleVB(mpDevice);
+    mpVertexBuffer = createAABB(mpDevice);
     AccelerationStructureBuffers bottomLevelBuffers = createBottomLevelAS(mpDevice, mpCmdList, mpVertexBuffer);
     AccelerationStructureBuffers topLevelBuffers = createTopLevelAS(mpDevice, mpCmdList, bottomLevelBuffers.pResult, mTlasSize);
 
@@ -596,24 +595,26 @@ struct DxilLibrary
 
 static const WCHAR* kRayGenShader = L"rayGen";
 static const WCHAR* kMissShader = L"miss";
+static const WCHAR* kIntersectionShader = L"sphereIntersection";
 static const WCHAR* kClosestHitShader = L"chs";
 static const WCHAR* kHitGroup = L"HitGroup";
 
 DxilLibrary createDxilLibrary()
 {
     // Compile the shader
-    ID3DBlobPtr pDxilLib = compileLibrary(L"Data/07-Shaders.hlsl", L"lib_6_3");
-    const WCHAR* entryPoints[] = { kRayGenShader, kMissShader, kClosestHitShader };
+    ID3DBlobPtr pDxilLib = compileLibrary(L"Data/15-Shaders.hlsl", L"lib_6_3");
+    const WCHAR* entryPoints[] = { kRayGenShader, kIntersectionShader, kMissShader, kClosestHitShader };
     return DxilLibrary(pDxilLib, entryPoints, arraysize(entryPoints));
 }
 
 struct HitProgram
 {
-    HitProgram(LPCWSTR ahsExport, LPCWSTR chsExport, const std::wstring& name) : exportName(name)
+    HitProgram(LPCWSTR ahsExport, LPCWSTR chsExport, LPCWSTR istExport, const std::wstring& name) : exportName(name)
     {
         desc = {};
         desc.AnyHitShaderImport = ahsExport;
         desc.ClosestHitShaderImport = chsExport;
+        desc.IntersectionShaderImport = istExport;
         desc.HitGroupExport = exportName.c_str();
 
         subObject.Type = D3D12_STATE_SUBOBJECT_TYPE_HIT_GROUP;
@@ -716,7 +717,7 @@ void DxrSample::createRtPipelineState()
     DxilLibrary dxilLib = createDxilLibrary();
     subobjects[index++] = dxilLib.stateSubobject;
 
-    HitProgram hitProgram(nullptr, kClosestHitShader, kHitGroup);
+    HitProgram hitProgram(nullptr, kClosestHitShader, kIntersectionShader, kHitGroup);
     subobjects[index++] = hitProgram.subObject;
 
     // Create the ray-gen root-signature and association
